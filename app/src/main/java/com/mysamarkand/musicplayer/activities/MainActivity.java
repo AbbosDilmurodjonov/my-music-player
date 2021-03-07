@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.mysamarkand.musicplayer.R;
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        songList = new ArrayList<SongModel>();
 
         getSongList();
 
@@ -71,29 +71,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getSongList() {
+
+        // Query external audio
         ContentResolver musicResolver = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
-        if (musicCursor != null && musicCursor.moveToFirst()) {
+        // Add songs
+        songList = new ArrayList<SongModel>();
+
+        if (musicCursor == null) {
+            // query failed, handle error.
+        } else if (!musicCursor.moveToFirst()) {
+            // no media on the device
+        } else {
             //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
+            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int uriColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+
             //add songs to list
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new SongModel(thisId, thisTitle, thisArtist));
-            }
-            while (musicCursor.moveToNext());
+                String thisUri = musicCursor.getString(uriColumn);
+                songList.add(new SongModel(thisId, thisTitle, thisArtist, thisUri));
+            } while (musicCursor.moveToNext());
         }
+
     }
-
-
 
 }

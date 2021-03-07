@@ -4,37 +4,33 @@ public class SongModel {
     private long id;
     private String title;
     private String artist;
+    private String uri;
 
-    public SongModel(long id, String title, String artist) {
+    public SongModel(long id, String title, String artist, String uri) {
         this.id = id;
         this.title = title;
         this.artist = artist;
+        this.uri = artist;
     }
 
-    public SongModel() {}
+    public SongModel() {
+    }
 
     // getter and setter methods
     public long getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public String getUri() {
+        return uri;
     }
+
 }
