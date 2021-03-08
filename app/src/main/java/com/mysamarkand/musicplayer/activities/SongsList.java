@@ -22,17 +22,17 @@ import com.mysamarkand.musicplayer.models.SongModel;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class SongsList extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
-    private ArrayList<SongModel> songList;
+    public static ArrayList<SongModel> songsList;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_songs_list);
         checkPermession();
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -41,14 +41,14 @@ public class MainActivity extends AppCompatActivity {
 
         getSongList();
 
-        recyclerViewAdapter = new RecyclerViewAdapter(MainActivity.this, songList);
+        recyclerViewAdapter = new RecyclerViewAdapter(SongsList.this, songsList);
         recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     private void checkPermession() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this,
+            ActivityCompat.requestPermissions(SongsList.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
         } else {
             Toast.makeText(this, "checkPermession() ok", Toast.LENGTH_SHORT).show();
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "onRequestPermession() ok", Toast.LENGTH_SHORT).show();
             } else {
                 finish();
-//                ActivityCompat.requestPermissions(MainActivity.this,
+//                ActivityCompat.requestPermissions(SongsList.this,
 //                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
             }
         }
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
         // Add songs
-        songList = new ArrayList<SongModel>();
+        songsList = new ArrayList<SongModel>();
 
         if (musicCursor == null) {
             // query failed, handle error.
@@ -97,10 +97,16 @@ public class MainActivity extends AppCompatActivity {
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisUri = musicCursor.getString(uriColumn);
-                songList.add(new SongModel(thisId, thisTitle, thisArtist, thisUri));
+                songsList.add(new SongModel(thisId, thisTitle, thisArtist, thisUri));
             } while (musicCursor.moveToNext());
         }
 
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
     }
 
 }
